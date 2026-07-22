@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "e43b1773-dbf8-4e89-8cc4-e9185a855325",
+  "packageName": "com.avara.cyberpulseava",
+  "developer": {
+    "name": "Avara Security",
+    "websiteUrl": "https://avara.com",
+    "privacyUrl": "https://avara.com/privacy",
+    "termsOfUseUrl": "https://avara.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "CyberPulse AVA",
+    "full": "CyberPulse AVA - Enterprise Security Companion"
+  },
+  "description": {
+    "short": "Your personal cybersecurity coach.",
+    "full": "CyberPulse AVA provides personalized security scores, device compliance tracking, threat intelligence, and security training directly within Microsoft Teams."
+  },
+  "accentColor": "#0F172A",
+  "staticTabs": [
+    {
+      "entityId": "home",
+      "name": "Home",
+      "contentUrl": "https://{your-app-domain}/?inTeams=true",
+      "websiteUrl": "https://{your-app-domain}/",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "{your-app-domain}"
+  ],
+  "webApplicationInfo": {
+    "id": "{your-entra-client-id}",
+    "resource": "api://{your-app-domain}/{your-entra-client-id}"
+  }
+}

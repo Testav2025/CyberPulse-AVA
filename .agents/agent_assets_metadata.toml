@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "PTX_cXbXuuGXLlyK1VqsL"
+uri = "file://.local/outputs/CyberPulse-AVA---Executive-Showcase.pdf"
+type = "pdf"
+title = "CyberPulse AVA — Executive Showcase.pdf"

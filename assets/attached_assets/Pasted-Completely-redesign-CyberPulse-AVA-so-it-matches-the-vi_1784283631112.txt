@@ -1,0 +1,190 @@
+Completely redesign CyberPulse AVA so it matches the visual style of an internal Avara employee platform rather than a security operations dashboard.
+
+DESIGN GOALS
+
+The application should feel:
+
+- Friendly
+- Modern
+- Professional
+- Employee-focused
+- Simple to understand
+- Welcoming for frontline workers
+
+Avoid:
+
+- Security operations centre aesthetics
+- Hacker visuals
+- Matrix styling
+- Excessive dark mode
+- Threat-monitoring dashboard appearance
+
+The application should look closer to:
+
+- Microsoft Viva
+- Microsoft Learn
+- Microsoft 365
+- Employee engagement platforms
+
+than a cybersecurity tool.
+
+-----------------------------------
+
+COLOUR SYSTEM
+
+Implement a configurable corporate theme system.
+
+Create:
+
+Primary Brand Colour
+Secondary Brand Colour
+Accent Colour
+Success Colour
+Warning Colour
+
+Store colours in a central theme configuration file so they can easily be replaced with official Avara branding colours later.
+
+The design must support:
+
+- Corporate Light Mode (default)
+- Corporate Dark Mode (optional)
+
+Light mode should be the primary experience.
+
+-----------------------------------
+
+VISUAL STYLE
+
+Use:
+
+- Rounded cards
+- Clean whitespace
+- Soft shadows
+- Friendly icons
+- Corporate illustrations
+
+Avoid:
+
+- Red alert overload
+- Aggressive warning colours
+- Technical dashboards
+
+-----------------------------------
+
+HOMEPAGE REDESIGN
+
+Replace technical dashboards with:
+
+Welcome Banner
+
+"Good Morning [Name]"
+
+Security Status:
+Safe / Attention Needed
+
+Security Score
+
+Recommended Actions
+
+Learning Progress
+
+Ask AVA
+
+The page should immediately answer:
+
+1. Am I safe?
+2. What should I do next?
+3. How can I improve?
+
+-----------------------------------
+
+ASK AVA
+
+Make Ask AVA the hero component.
+
+Place it prominently on the home page.
+
+Style it similarly to:
+
+Microsoft Copilot
+
+with conversation cards and suggested prompts.
+
+-----------------------------------
+
+EMPLOYEE EXPERIENCE
+
+The platform should feel like:
+
+A personal security coach
+
+rather than
+
+A security monitoring tool.
+
+The focus should be:
+
+- Guidance
+- Education
+- Awareness
+- Positive reinforcement
+
+rather than
+
+- Threats
+- Incidents
+- Vulnerabilities
+
+-----------------------------------
+
+GAMIFICATION
+
+Create a modern achievement section.
+
+Include:
+
+- Levels
+- Progress bars
+- Security badges
+- Learning streaks
+- Monthly goals
+
+Inspired by:
+
+Duolingo
+Microsoft Learn
+
+-----------------------------------
+
+ROLE BASED UI
+
+Frontline Worker
+
+Simple experience.
+
+Office Worker
+
+Moderate detail.
+
+Manager
+
+Team insights.
+
+IT/Security
+
+Advanced technical mode.
+
+Hide technical content from standard users by default.
+
+-----------------------------------
+
+MICROSOFT 365 INTEGRATION FEEL
+
+The entire experience should feel like a first-party Microsoft 365 application that could sit naturally inside:
+
+- Teams
+- Company Portal
+- Viva Connections
+- Microsoft 365
+
+Use Fluent UI styling patterns wherever possible.

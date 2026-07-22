@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "CyberPulse AVA"
+version = "1.0.0"
+id = "artifacts/cyberpulse-ava"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22881
+
+[services.development]
+run = "pnpm --filter @workspace/cyberpulse-ava run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cyberpulse-ava", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/cyberpulse-ava/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22881"
+BASE_PATH = "/"

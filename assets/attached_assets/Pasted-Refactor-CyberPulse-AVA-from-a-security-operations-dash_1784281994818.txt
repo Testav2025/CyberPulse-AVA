@@ -1,0 +1,245 @@
+Refactor CyberPulse AVA from a security operations dashboard into an employee-first security companion platform.
+
+The target audience is:
+
+- Frontline manufacturing workers
+- Office staff
+- HR
+- Finance
+- Operations
+- Managers
+
+The platform must use plain English and avoid technical security jargon.
+
+GENERAL PRINCIPLES
+
+- Every page should answer:
+  "Am I safe?"
+  "Do I need to do anything?"
+  "How can I improve my security?"
+
+- Remove or hide highly technical information.
+- Introduce role-based experiences.
+- Make the UI feel friendly, modern, supportive and educational.
+- Use Microsoft Fluent design principles.
+- Prioritise accessibility, simple language and mobile use.
+
+------------------------------------
+
+RENAME SECTIONS
+
+Current -> New
+
+CyberScore -> My Security Score
+
+Darktrace -> Email Protection
+
+Pentera -> Security Improvements
+
+Alerts -> Important Security Messages
+
+Devices -> My Devices
+
+Training -> Cyber Learning
+
+AI Assistant -> Ask AVA
+
+------------------------------------
+
+EMPLOYEE HOME DASHBOARD
+
+Replace technical dashboard widgets with:
+
+1. Welcome Card
+
+"Good Morning Norbert"
+
+Security Status:
+Safe / Attention Needed / Action Required
+
+2. Security Score Card
+
+My Security Score:
+87/100
+
+Above company average
+
+Simple explanation:
+"Your account and device are well protected."
+
+3. My Account
+
+MFA Enabled ✅
+No risky sign-ins ✅
+Password Status ✅
+
+4. My Device
+
+Protected ✅
+Encrypted ✅
+Up To Date ✅
+
+5. Email Protection
+
+Darktrace has blocked:
+4 suspicious emails this month
+
+Show simple language only.
+
+6. Recommended Actions
+
+Examples:
+
+- Complete Security Awareness Challenge
+- Review Password Guidance
+- Learn How to Spot Phishing
+
+------------------------------------
+
+CREATE ROLE-BASED VIEWS
+
+Frontline Worker View
+
+Show only:
+
+- My Security Score
+- My Account
+- My Device
+- Cyber Learning
+- Ask AVA
+
+Office Worker View
+
+Additionally show:
+
+- Email Protection
+- Document Sharing Safety
+
+IT / Security View
+
+Allow:
+
+- Advanced View Toggle
+
+Only here show:
+
+- Technical findings
+- Pentera details
+- Threat intelligence
+- CVSS
+- MITRE ATT&CK
+
+------------------------------------
+
+REMOVE TECHNICAL TERMS
+
+Hide from standard user view:
+
+- CVSS
+- ATT&CK
+- Exploit Path
+- Vulnerability Severity
+- Threat Hunting
+- Lateral Movement
+
+Translate into plain English.
+
+Example:
+
+"High Priority Security Improvement"
+
+instead of
+
+"CVSS 8.9 Vulnerability"
+
+------------------------------------
+
+EXPAND ASK AVA
+
+Ask AVA should become the centrepiece of the platform.
+
+Prebuilt prompts:
+
+- Am I secure?
+- Why did my score change?
+- Have I received suspicious emails?
+- What should I improve this week?
+- What is phishing?
+- How do I stay safe online?
+- Has my device got any issues?
+
+Responses should use simple non-technical language.
+
+------------------------------------
+
+GAMIFICATION
+
+Create:
+
+Cyber Learning Challenges
+
+Users earn:
+
+- Security Points
+- Badges
+- Levels
+
+Examples:
+
+Level 1:
+Spot a phishing email
+
+Level 2:
+Create a strong password
+
+Level 3:
+Protect company information
+
+Show progress bar.
+
+------------------------------------
+
+MANAGER DASHBOARD
+
+Create a lightweight manager page:
+
+My Team Security
+
+Show:
+
+- Team Security Score
+- Training Completion
+- Security Engagement
+
+Do not show personal security details.
+
+------------------------------------
+
+ADD FUTURE PLACEHOLDERS
+
+Create integrations ready for:
+
+- Microsoft Graph
+- Entra ID
+- Intune
+- Darktrace
+- Pentera
+- Defender
+- Teams
+- Copilot Studio
+
+Keep architecture modular.
+
+------------------------------------
+
+FINAL PRODUCT VISION
+
+CyberPulse AVA should feel like:
+
+"Your personal security coach"
+
+NOT
+
+"A SOC analyst dashboard"
+
+The experience should be understandable by any employee regardless of technical knowledge.
