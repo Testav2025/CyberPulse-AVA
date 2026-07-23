@@ -29,9 +29,21 @@ import {
 import { Link } from "wouter";
 import { scoreDescription } from "@/lib/role-utils";
 
+function normalizeHistory(value: unknown) {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.history)) return record.history;
+    if (Array.isArray(record.data)) return record.data;
+    if (Array.isArray(record.items)) return record.items;
+  }
+  return [];
+}
+
 export default function Score() {
   const { data: score, isLoading: isLoadingScore } = useGetCyberScore();
   const { data: history, isLoading: isLoadingHistory } = useGetCyberScoreHistory({ days: 30 });
+  const normalizedHistory = normalizeHistory(history);
 
   return (
     <div className="space-y-6 pb-8 animate-in fade-in duration-500">
@@ -152,9 +164,9 @@ export default function Score() {
           <CardContent className="h-[300px]">
             {isLoadingHistory ? (
               <Skeleton className="h-full w-full" />
-            ) : history && history.length > 0 ? (
+            ) : normalizedHistory.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+                <AreaChart data={normalizedHistory} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
@@ -258,8 +270,9 @@ function ScoreComponentCard({
   title: string; subtitle: string; score: number;
   icon: any; color: string; path: string; tip: string;
 }) {
-  const scoreLabel = score >= 80 ? 'Good' : score >= 60 ? 'Fair' : 'Needs attention';
-  const scoreColor = score >= 80 ? 'text-emerald-500' : score >= 60 ? 'text-amber-500' : 'text-red-500';
+  const normalizedScore = Number.isFinite(Number(score)) ? Number(score) : 0;
+  const scoreLabel = normalizedScore >= 80 ? 'Good' : normalizedScore >= 60 ? 'Fair' : 'Needs attention';
+  const scoreColor = normalizedScore >= 80 ? 'text-emerald-500' : normalizedScore >= 60 ? 'text-amber-500' : 'text-red-500';
 
   return (
     <Card className="hover:border-primary/50 transition-colors group">
@@ -274,9 +287,9 @@ function ScoreComponentCard({
           <p className="font-semibold text-sm">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
-        <Progress value={score} indicatorClassName={color} className="h-2 mb-2" />
+        <Progress value={normalizedScore} indicatorClassName={color} className="h-2 mb-2" />
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{score}/100</span>
+          <span>{normalizedScore}/100</span>
         </div>
         <div className="mt-3 pt-3 border-t border-border">
           <p className="text-xs text-muted-foreground flex items-start gap-1">

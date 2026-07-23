@@ -89,6 +89,18 @@ const CATEGORY_LABELS: Record<string, string> = {
   "Endpoint Security": "Device Security",
 };
 
+function normalizeCollection<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.items)) return record.items as T[];
+    if (Array.isArray(record.data)) return record.data as T[];
+    if (Array.isArray(record.modules)) return record.modules as T[];
+    if (Array.isArray(record.leaderboard)) return record.leaderboard as T[];
+  }
+  return [];
+}
+
 export default function Training() {
   const [activeFilter, setActiveFilter] = useState<"all" | "not_started" | "in_progress" | "completed">("all");
   const { toast } = useToast();
@@ -129,7 +141,9 @@ export default function Training() {
     queryClient.invalidateQueries({ queryKey: ["/api/cyberscore"] });
   };
 
-  const points = progress?.totalPoints || 0;
+  const normalizedModules = normalizeCollection<any>(modules);
+  const normalizedLeaderboard = normalizeCollection<any>(leaderboard);
+  const points = Number(progress?.totalPoints) || 0;
   const levelInfo = getLevelFromPoints(points);
   const progressToNext = levelInfo.level < 5
     ? Math.round(((points - (
@@ -250,26 +264,28 @@ export default function Training() {
                     <Skeleton className="h-4 flex-1" />
                   </div>
                 ))
-              ) : leaderboard?.slice(0, 5).map((entry, idx) => (
-                <div key={entry.userId} className="flex items-center gap-3">
-                  <div className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold flex-shrink-0 ${
-                    idx === 0 ? "bg-yellow-500/20 text-yellow-500" :
-                    idx === 1 ? "bg-slate-300/20 text-slate-300" :
-                    idx === 2 ? "bg-amber-700/20 text-amber-600" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {idx + 1}
+              ) : normalizedLeaderboard.length > 0 ? (
+                normalizedLeaderboard.slice(0, 5).map((entry, idx) => (
+                  <div key={entry.userId} className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold flex-shrink-0 ${
+                      idx === 0 ? "bg-yellow-500/20 text-yellow-500" :
+                      idx === 1 ? "bg-slate-300/20 text-slate-300" :
+                      idx === 2 ? "bg-amber-700/20 text-amber-600" : "bg-muted text-muted-foreground"
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={entry.avatarUrl || ""} />
+                      <AvatarFallback className="text-xs">{entry.displayName.substring(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{entry.displayName.split(" ")[0]}</div>
+                      <div className="text-xs text-muted-foreground">{entry.department}</div>
+                    </div>
+                    <div className="text-xs font-bold text-purple-400">{entry.totalPoints} pts</div>
                   </div>
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage src={entry.avatarUrl || ""} />
-                    <AvatarFallback className="text-xs">{entry.displayName.substring(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{entry.displayName.split(" ")[0]}</div>
-                    <div className="text-xs text-muted-foreground">{entry.department}</div>
-                  </div>
-                  <div className="text-xs font-bold text-purple-400">{entry.totalPoints} pts</div>
-                </div>
-              ))}
+                ))
+              ) : null}
             </div>
           </CardContent>
         </Card>
@@ -337,8 +353,8 @@ export default function Training() {
                 <CardFooter><Skeleton className="h-10 w-full" /></CardFooter>
               </Card>
             ))
-          ) : modules && modules.length > 0 ? (
-            modules.map((module) => (
+          ) : normalizedModules.length > 0 ? (
+            normalizedModules.map((module) => (
               <Card key={module.id} className="flex flex-col hover-elevate transition-all hover:border-purple-500/40 overflow-hidden group">
                 <CardHeader className="pb-3 relative">
                   {module.isMandatory && (

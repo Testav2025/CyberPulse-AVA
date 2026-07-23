@@ -27,12 +27,7 @@
 # ============================================================================
 minimumReleaseAge: 1440
 
-minimumReleaseAgeExclude:
-  # Exclude @replit scoped packages from the minimum release age check.
-  # These are published by Replit and trusted — the supply-chain attack vector
-  # this setting guards against does not apply to our own packages.
-  - '@replit/*'
-  - stripe-replit-sync
+minimumReleaseAgeExclude: []
 
 packages:
   - apps/*
@@ -46,9 +41,6 @@ catalog:
   '@azure/msal-react': ^2.0.15
   '@microsoft/microsoft-graph-client': ^3.0.7
   '@microsoft/teams-js': ^2.20.0
-  '@replit/vite-plugin-cartographer': ^0.5.21
-  '@replit/vite-plugin-dev-banner': ^0.1.1
-  '@replit/vite-plugin-runtime-error-modal': ^0.0.6
   '@tailwindcss/vite': ^4.1.14
   '@tanstack/react-query': ^5.90.21
   '@types/isomorphic-fetch': ^0.0.39
@@ -84,6 +76,7 @@ onlyBuiltDependencies:
   - msw
   - unrs-resolver
 
+allowBuilds:
+  esbuild: false
 
 # overrides removed for local Windows execution compatibility
-

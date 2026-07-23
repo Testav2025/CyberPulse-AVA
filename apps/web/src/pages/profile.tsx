@@ -22,9 +22,12 @@ export default function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [themePref, setThemePref] = useState("dark");
 
+  const safeDisplayName = user?.displayName || "User";
+  const safeInitials = safeDisplayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "U";
+
   useEffect(() => {
     if (user) {
-      setDisplayName(user.displayName);
+      setDisplayName(user.displayName || "");
       setThemePref(user.theme || "dark");
       setTheme((user.theme as any) || "dark");
     }
@@ -69,7 +72,7 @@ export default function Profile() {
             <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
               <AvatarImage src={user?.avatarUrl || ''} />
               <AvatarFallback className="text-2xl bg-muted">
-                {user?.displayName.substring(0, 2).toUpperCase() || 'U'}
+                {safeInitials}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -77,7 +80,7 @@ export default function Profile() {
         <CardContent className="pt-14 pb-6">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold">{user?.displayName}</h2>
+              <h2 className="text-2xl font-bold">{safeDisplayName}</h2>
               <p className="text-muted-foreground font-medium flex items-center gap-1.5 mt-1">
                 <Shield className="h-4 w-4 text-primary" /> {user?.role}
               </p>

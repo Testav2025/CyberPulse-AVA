@@ -45,6 +45,18 @@ function riskLabel(score: number): { label: string; color: string } {
   return { label: 'Low concern', color: 'text-blue-500' };
 }
 
+function normalizeCollection<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.items)) return record.items as T[];
+    if (Array.isArray(record.data)) return record.data as T[];
+    if (Array.isArray(record.incidents)) return record.incidents as T[];
+    if (Array.isArray(record.results)) return record.results as T[];
+  }
+  return [];
+}
+
 export default function Darktrace() {
   const { data: user } = useGetCurrentUser();
   const { data: summary, isLoading: isLoadingSummary } = useGetDarktraceSummary();
@@ -54,7 +66,9 @@ export default function Darktrace() {
   const [advancedView, setAdvancedView] = useState(false);
   const showAdvanced = canSeeAdvancedData(tier) && advancedView;
 
-  const emailsBlocked = summary ? Math.max(0, (summary.activeIncidents - 4)) + 4 : 0;
+  const normalizedIncidents = normalizeCollection<any>(incidents);
+  const activeIncidents = Number(summary?.activeIncidents) || 0;
+  const emailsBlocked = Math.max(0, activeIncidents - 4) + 4;
 
   return (
     <div className="space-y-6 pb-8 animate-in fade-in duration-500">
@@ -160,8 +174,8 @@ export default function Darktrace() {
                   </div>
                 </div>
               ))
-            ) : incidents && incidents.length > 0 ? (
-              incidents.map((incident) => {
+            ) : normalizedIncidents.length > 0 ? (
+              normalizedIncidents.map((incident) => {
                 const risk = riskLabel(incident.score);
                 return (
                   <div key={incident.id} className="group flex items-start gap-4 p-4 rounded-xl border border-border/60 hover:bg-muted/30 transition-colors">

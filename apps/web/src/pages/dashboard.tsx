@@ -44,6 +44,21 @@ const PREBUILT_PROMPTS = [
   { label: "What is phishing?", icon: Info, color: "text-purple-500" },
 ];
 
+function normalizeDevices(value: unknown) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.devices)) return record.devices;
+    if (Array.isArray(record.items)) return record.items;
+    if (Array.isArray(record.data)) return record.data;
+  }
+
+  return [];
+}
+
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const [avaInput, setAvaInput] = useState("");
@@ -74,7 +89,8 @@ export default function Dashboard() {
     summary?.totalDevices || 0
   );
 
-  const myDevices = devices?.filter((d) => d.userId === "user-001") || [];
+  const normalizedDevices = normalizeDevices(devices);
+  const myDevices = normalizedDevices.filter((d) => d.userId === "user-001") || [];
   const primaryDevice = myDevices[0];
   const deviceOk = primaryDevice?.complianceState === "compliant";
   const encryptionOk = primaryDevice?.encryptionEnabled ?? false;
@@ -86,7 +102,8 @@ export default function Dashboard() {
   const levelInfo = getLevelFromPoints(points);
 
   // Avara Security News — derived from live seed data
-  const completedEmployees = leaderboard?.length ?? 0;
+  const normalizedLeaderboard = normalizeDevices(leaderboard);
+  const completedEmployees = normalizedLeaderboard.length;
   const newsItems = [
     {
       icon: Mail,
@@ -98,7 +115,7 @@ export default function Dashboard() {
       icon: Users,
       color: "text-emerald-400",
       bg: "bg-emerald-500/10",
-      text: `${(leaderboard?.filter(u => (u.completedModules ?? 0) > 0).length ?? 0) * 48 + 264} employees completed security training this month`,
+      text: `${(normalizedLeaderboard.filter((u: { completedModules?: number }) => (u.completedModules ?? 0) > 0).length ?? 0) * 48 + 264} employees completed security training this month`,
     },
     {
       icon: TrendingUp,

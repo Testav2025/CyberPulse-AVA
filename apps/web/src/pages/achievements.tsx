@@ -107,13 +107,25 @@ const BADGES = [
 
 const LEVEL_PREV_POINTS = [0, 0, 30, 70, 120, 200];
 
+function normalizeCollection<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.items)) return record.items as T[];
+    if (Array.isArray(record.data)) return record.data as T[];
+    if (Array.isArray(record.leaderboard)) return record.leaderboard as T[];
+    if (Array.isArray(record.devices)) return record.devices as T[];
+  }
+  return [];
+}
+
 export default function Achievements() {
   const { data: user } = useGetCurrentUser();
   const { data: progress, isLoading } = useGetTrainingProgress();
   const { data: leaderboard } = useGetTrainingLeaderboard({ limit: 5 });
   const { data: devices } = useGetDevices({});
 
-  const points = progress?.totalPoints || 0;
+  const points = Number(progress?.totalPoints) || 0;
   const levelInfo = getLevelFromPoints(points);
   const prevAt = LEVEL_PREV_POINTS[levelInfo.level] ?? 0;
   const progressToNext =
@@ -121,7 +133,10 @@ export default function Achievements() {
       ? Math.round(((points - prevAt) / (levelInfo.nextAt - prevAt)) * 100)
       : 100;
 
-  const myDevices = devices?.filter((d) => d.userId === "user-001") || [];
+  const normalizedDevices = normalizeCollection<Record<string, unknown>>(devices);
+  const normalizedLeaderboard = normalizeCollection<Record<string, unknown>>(leaderboard);
+
+  const myDevices = normalizedDevices.filter((d) => (d.userId as string | undefined) === "user-001") || [];
   const hasMfa = true; // Alex has MFA on (seeded)
 
   const earnedBadges = BADGES.filter((b) => {
@@ -135,7 +150,7 @@ export default function Achievements() {
   });
 
   const firstName = user?.displayName?.split(" ")[0] || "there";
-  const streak = progress?.currentStreak || 0;
+  const streak = Number(progress?.currentStreak) || 0;
 
   return (
     <div className="space-y-6 pb-8 animate-in fade-in duration-500">
@@ -312,7 +327,7 @@ export default function Achievements() {
       )}
 
       {/* Leaderboard */}
-      {leaderboard && leaderboard.length > 0 && (
+      {normalizedLeaderboard.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -322,7 +337,7 @@ export default function Achievements() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {leaderboard.slice(0, 5).map((entry, i) => {
+              {normalizedLeaderboard.slice(0, 5).map((entry, i) => {
                 const entryLevel = getLevelFromPoints(entry.totalPoints || 0);
                 return (
                   <div key={entry.userId} className="flex items-center gap-3">

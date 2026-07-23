@@ -107,12 +107,19 @@ export default function Alerts() {
     );
   };
 
-  const filteredAlerts = alerts?.filter(alert =>
-    alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    alert.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const normalizedAlerts = Array.isArray(alerts)
+    ? alerts
+    : alerts && typeof alerts === "object"
+      ? ((alerts as Record<string, unknown>).items as Array<Record<string, unknown>>) || ((alerts as Record<string, unknown>).alerts as Array<Record<string, unknown>>) || []
+      : [];
 
-  const selectedAlert = alerts?.find(a => a.id === selectedAlertId);
+  const filteredAlerts = normalizedAlerts.filter((alert) => {
+    const title = String((alert as Record<string, unknown>).title || "").toLowerCase();
+    const category = String((alert as Record<string, unknown>).category || "").toLowerCase();
+    return title.includes(searchTerm.toLowerCase()) || category.includes(searchTerm.toLowerCase());
+  });
+
+  const selectedAlert = normalizedAlerts.find((a) => String((a as Record<string, unknown>).id) === selectedAlertId);
 
   const dotColor = (severity: string) => {
     switch (severity) {

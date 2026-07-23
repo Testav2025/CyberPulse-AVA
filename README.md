@@ -1,8 +1,10 @@
 # CyberPulse-AVA
 
-> Your Personal Cyber Security Command Centre
+Your Personal Cyber Security Command Centre
 
-CyberPulse-AVA is a Microsoft-integrated cybersecurity companion platform that gives every employee a personalised security command centre. It combines CyberScore analytics, device compliance monitoring, threat intelligence, security awareness training, and AI-powered guidance from AVA to improve cyber resilience through engagement, visibility, and actionable insights.
+CyberPulse-AVA is an internal cybersecurity platform developed for Avara Foods to improve employee security engagement, device compliance visibility, security awareness, and organisational cyber resilience.
+
+This project is intended for internal use and is not currently distributed as a commercial product
 
 ## Vision
 

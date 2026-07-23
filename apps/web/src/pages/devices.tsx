@@ -80,12 +80,19 @@ export default function Devices() {
     complianceState: complianceFilter !== "all" ? (complianceFilter as any) : undefined,
   });
 
-  const filteredDevices = devices?.filter(
-    (device) =>
-      device.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      device.platform.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (device.userDisplayName && device.userDisplayName.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const normalizedDevices = Array.isArray(devices)
+    ? devices
+    : devices && typeof devices === "object"
+      ? ((devices as Record<string, unknown>).items as Array<Record<string, unknown>>) || ((devices as Record<string, unknown>).devices as Array<Record<string, unknown>>) || []
+      : [];
+
+  const filteredDevices = normalizedDevices.filter((device) => {
+    const deviceName = String((device as Record<string, unknown>).deviceName || "").toLowerCase();
+    const platform = String((device as Record<string, unknown>).platform || "").toLowerCase();
+    const userDisplayName = String((device as Record<string, unknown>).userDisplayName || "").toLowerCase();
+
+    return deviceName.includes(searchTerm.toLowerCase()) || platform.includes(searchTerm.toLowerCase()) || userDisplayName.includes(searchTerm.toLowerCase());
+  });
 
   const getPlatformIcon = (platform: string) => {
     const p = platform.toLowerCase();

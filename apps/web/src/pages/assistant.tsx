@@ -31,6 +31,18 @@ const PREBUILT_PROMPTS = [
   { label: "What training should I do?", icon: BookOpen, color: "text-teal-500" },
 ];
 
+function normalizeCollection<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (Array.isArray(record.items)) return record.items as T[];
+    if (Array.isArray(record.data)) return record.data as T[];
+    if (Array.isArray(record.messages)) return record.messages as T[];
+    if (Array.isArray(record.history)) return record.history as T[];
+  }
+  return [];
+}
+
 export default function Assistant() {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -45,8 +57,9 @@ export default function Assistant() {
   const firstName = user?.displayName?.split(" ")[0] || "there";
 
   useEffect(() => {
-    if (history) {
-      setLocalMessages(history.slice().reverse());
+    const normalizedHistory = normalizeCollection<any>(history);
+    if (normalizedHistory.length > 0) {
+      setLocalMessages(normalizedHistory.slice().reverse());
     }
   }, [history]);
 
