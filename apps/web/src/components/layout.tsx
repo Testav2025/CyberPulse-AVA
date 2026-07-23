@@ -6,7 +6,7 @@ import { useGetCurrentUser } from '@workspace/api-client-react';
 import { useAuth } from './auth-provider';
 import { useTeamsContext } from '@/hooks/useTeamsContext';
 import { MobileNav } from './mobile-nav';
-import { getViewTier } from '@/lib/role-utils';
+import { getEffectiveUserProfile, getViewTier } from '@/lib/role-utils';
 import { 
   LayoutDashboard, 
   Activity, 
@@ -52,9 +52,10 @@ export function Layout({ children }: { children: ReactNode }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
-  const tier = getViewTier(userProfile?.role, userProfile?.jobTitle);
+  const effectiveUser = getEffectiveUserProfile(userProfile || msalUser);
+  const tier = getViewTier(effectiveUser.role, effectiveUser.jobTitle);
   const isLoading = isProfileLoading || isAuthLoading;
-  const user = userProfile || msalUser; // Fallback to MSAL user info if profile not loaded
+  const user = effectiveUser;
 
 
   const handleRefresh = async () => {

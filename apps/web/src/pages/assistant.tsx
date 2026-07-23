@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useSendAssistantMessage, useGetAssistantHistory, useGetCurrentUser, useGetCyberScore } from "@workspace/api-client-react";
+import { useAuth } from "@/components/auth-provider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { format } from "date-fns";
+import { getDisplayName, getEffectiveUserProfile } from "@/lib/role-utils";
 
 const PREBUILT_PROMPTS = [
   { label: "Am I secure?", icon: ShieldCheck, color: "text-emerald-500" },
@@ -46,6 +48,7 @@ function normalizeCollection<T>(value: unknown): T[] {
 export default function Assistant() {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { user: msalUser } = useAuth();
 
   const { data: user } = useGetCurrentUser();
   const { data: score } = useGetCyberScore();
@@ -54,7 +57,9 @@ export default function Assistant() {
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const [pendingSent, setPendingSent] = useState(false);
 
-  const firstName = user?.displayName?.split(" ")[0] || "there";
+  const effectiveUser = getEffectiveUserProfile(user || msalUser);
+  const displayName = getDisplayName(effectiveUser, "there");
+  const firstName = displayName.split(" ")[0] || "there";
 
   useEffect(() => {
     const normalizedHistory = normalizeCollection<any>(history);
@@ -111,16 +116,14 @@ export default function Assistant() {
       {!hasConversation && !isLoading ? (
         <div className="flex flex-col items-center text-center py-6 mb-2">
           <div className="relative mb-4">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-xl">
-              <Bot className="h-8 w-8 text-white" />
-            </div>
+            <img src="/cyberpulse-ava-logo.jpg" alt="CyberPulse AVA logo" className="h-16 w-16 rounded-2xl object-cover border border-primary/20 shadow-xl" />
             <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Good {getGreeting()}, {firstName}
+            Good {getGreeting()}, {displayName}
           </h1>
           {score && (
             <p className="text-sm text-muted-foreground mt-1">
@@ -135,9 +138,7 @@ export default function Assistant() {
       ) : (
         <div className="flex items-center gap-3 mb-4">
           <div className="relative">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow">
-              <Bot className="h-5 w-5 text-white" />
-            </div>
+            <img src="/cyberpulse-ava-logo.jpg" alt="CyberPulse AVA logo" className="h-10 w-10 rounded-xl object-cover border border-primary/20 shadow" />
             <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />

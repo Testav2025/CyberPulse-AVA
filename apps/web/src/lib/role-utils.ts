@@ -4,6 +4,68 @@
  */
 
 export type ViewTier = 'frontline' | 'office' | 'security' | 'manager';
+export type DemoAccountKey = 'frontline' | 'office' | 'manager' | 'security';
+
+export interface DemoAccountOption {
+  key: DemoAccountKey;
+  label: string;
+  description: string;
+  displayName: string;
+  role: string;
+  jobTitle: string;
+  department: string;
+  viewLabel: string;
+  levelLabel: string;
+}
+
+export const DEMO_ACCOUNT_OPTIONS: DemoAccountOption[] = [
+  {
+    key: 'frontline',
+    label: 'Frontline Worker',
+    description: 'Operational view with core security basics.',
+    displayName: 'Liam Patel',
+    role: 'Frontline Worker',
+    jobTitle: 'Warehouse Operator',
+    department: 'Operations',
+    viewLabel: 'Frontline Worker',
+    levelLabel: 'Level 1 · Recruit',
+  },
+  {
+    key: 'office',
+    label: 'Office Staff',
+    description: 'Desk-based view with everyday compliance guidance.',
+    displayName: 'Maya Chen',
+    role: 'Office Staff',
+    jobTitle: 'Operations Coordinator',
+    department: 'Administration',
+    viewLabel: 'Office Staff',
+    levelLabel: 'Level 2 · Defender',
+  },
+  {
+    key: 'manager',
+    label: 'Manager',
+    description: 'Leadership view with team oversight and coaching.',
+    displayName: 'Daniel Brooks',
+    role: 'Manager',
+    jobTitle: 'Operations Manager',
+    department: 'Management',
+    viewLabel: 'Manager',
+    levelLabel: 'Level 3 · Protector',
+  },
+  {
+    key: 'security',
+    label: 'IT Security',
+    description: 'Advanced security view with incident visibility.',
+    displayName: 'Ava Singh',
+    role: 'IT Security',
+    jobTitle: 'Security Analyst',
+    department: 'IT Security',
+    viewLabel: 'IT Security',
+    levelLabel: 'Level 4 · Cyber Guardian',
+  },
+];
+
+const DEMO_ACCOUNT_STORAGE_KEY = 'cyberpulse-demo-account';
 
 const SECURITY_ROLES = [
   'security engineer', 'soc analyst', 'cloud security architect',
@@ -21,6 +83,51 @@ const FRONTLINE_ROLES = [
   'operator', 'technician', 'worker', 'associate', 'operative',
   'line worker', 'production', 'warehouse', 'driver', 'field'
 ];
+
+export function getStoredDemoAccount(): DemoAccountKey {
+  if (typeof window === 'undefined') return 'office';
+  const stored = window.localStorage.getItem(DEMO_ACCOUNT_STORAGE_KEY) as DemoAccountKey | null;
+  return stored && DEMO_ACCOUNT_OPTIONS.some((option) => option.key === stored) ? stored : 'office';
+}
+
+export function setStoredDemoAccount(account: DemoAccountKey) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(DEMO_ACCOUNT_STORAGE_KEY, account);
+}
+
+export function getDisplayName(
+  user?: { displayName?: string | null; name?: string | null; username?: string | null; email?: string | null } | null,
+  fallback = 'there'
+) {
+  return user?.displayName || user?.name || user?.username || user?.email || fallback;
+}
+
+export function getEffectiveUserProfile(
+  user?: {
+    displayName?: string | null;
+    name?: string | null;
+    username?: string | null;
+    email?: string | null;
+    role?: string | null;
+    jobTitle?: string | null;
+    department?: string | null;
+    [key: string]: unknown;
+  } | null
+) {
+  const selected = getStoredDemoAccount();
+  const account = DEMO_ACCOUNT_OPTIONS.find((option) => option.key === selected);
+  const displayName = getDisplayName(user, account?.displayName || 'there');
+
+  return {
+    ...user,
+    displayName,
+    role: account?.role ?? user?.role ?? 'Office Staff',
+    jobTitle: account?.jobTitle ?? user?.jobTitle ?? null,
+    department: account?.department ?? user?.department ?? null,
+    viewLabel: account?.viewLabel ?? 'Office Staff',
+    levelLabel: account?.levelLabel ?? 'Level 2 · Defender',
+  };
+}
 
 export function getViewTier(role?: string | null, jobTitle?: string | null): ViewTier {
   const combined = `${role || ''} ${jobTitle || ''}`.toLowerCase();

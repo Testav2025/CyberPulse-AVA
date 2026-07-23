@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserCircle, Shield, Building2, Mail, Monitor, Moon, Sun } from "lucide-react";
+import { DEMO_ACCOUNT_OPTIONS, getStoredDemoAccount, setStoredDemoAccount, type DemoAccountKey } from "@/lib/role-utils";
 
 export default function Profile() {
   const { data: user, isLoading } = useGetCurrentUser();
@@ -21,6 +22,7 @@ export default function Profile() {
 
   const [displayName, setDisplayName] = useState("");
   const [themePref, setThemePref] = useState("dark");
+  const [demoAccount, setDemoAccount] = useState<DemoAccountKey>(getStoredDemoAccount());
 
   const safeDisplayName = user?.displayName || "User";
   const safeInitials = safeDisplayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "U";
@@ -32,6 +34,11 @@ export default function Profile() {
       setTheme((user.theme as any) || "dark");
     }
   }, [user, setTheme]);
+
+  const handleDemoAccountSelect = (account: DemoAccountKey) => {
+    setDemoAccount(account);
+    setStoredDemoAccount(account);
+  };
 
   const handleSave = () => {
     updateUser.mutate({
@@ -124,6 +131,31 @@ export default function Profile() {
               className="max-w-md"
             />
             <p className="text-xs text-muted-foreground">This is how you appear on leaderboards and to AVA.</p>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Label>Demo account views</Label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {DEMO_ACCOUNT_OPTIONS.map((option) => {
+                const active = option.key === demoAccount;
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => handleDemoAccountSelect(option.key)}
+                    className={`rounded-lg border p-3 text-left transition-all ${active ? "border-primary bg-primary/10 shadow-sm" : "border-border bg-card hover:border-primary/40"}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold">{option.label}</p>
+                      {active && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Active</span>}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
+                    <p className="mt-2 text-[11px] font-medium text-foreground">{option.viewLabel} • {option.levelLabel}</p>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">Switch between frontline, office, manager, and IT security personas to preview the experience.</p>
           </div>
 
           <div className="space-y-3 pt-2">

@@ -9,12 +9,13 @@ import {
   useGetTrainingLeaderboard,
 } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/components/auth-provider";
 import { CyberScoreRing } from "@/components/cyberscore-ring";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getViewTier, getSecurityStatus, getLevelFromPoints } from "@/lib/role-utils";
+import { getDisplayName, getEffectiveUserProfile, getViewTier, getSecurityStatus, getLevelFromPoints } from "@/lib/role-utils";
 import {
   CheckCircle2,
   AlertTriangle,
@@ -62,6 +63,7 @@ function normalizeDevices(value: unknown) {
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const [avaInput, setAvaInput] = useState("");
+  const { user: msalUser } = useAuth();
 
   const { data: user, isLoading: isLoadingUser } = useGetCurrentUser();
   const { data: score, isLoading: isLoadingScore } = useGetCyberScore();
@@ -71,7 +73,8 @@ export default function Dashboard() {
   const { data: trainingProgress } = useGetTrainingProgress();
   const { data: leaderboard } = useGetTrainingLeaderboard({ limit: 10 });
 
-  const tier = getViewTier(user?.role, user?.jobTitle);
+  const effectiveUser = getEffectiveUserProfile(user || msalUser);
+  const tier = getViewTier(effectiveUser.role, effectiveUser.jobTitle);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -80,7 +83,8 @@ export default function Dashboard() {
     return "Good evening";
   };
 
-  const firstName = user?.displayName?.split(" ")[0] || "there";
+  const displayName = getDisplayName(effectiveUser, "there");
+  const firstName = displayName.split(" ")[0] || "there";
 
   const status = getSecurityStatus(
     summary?.criticalAlerts || 0,
@@ -103,7 +107,14 @@ export default function Dashboard() {
 
   // Avara Security News — derived from live seed data
   const normalizedLeaderboard = normalizeDevices(leaderboard);
-  const completedEmployees = normalizedLeaderboard.length;
+  const fallbackLeaderboard = [
+    { userId: "demo-frontline", displayName: "Liam Patel", totalPoints: 24, completedModules: 3 },
+    { userId: "demo-office", displayName: "Maya Chen", totalPoints: 58, completedModules: 5 },
+    { userId: "demo-manager", displayName: "Daniel Brooks", totalPoints: 92, completedModules: 8 },
+    { userId: "demo-security", displayName: "Ava Singh", totalPoints: 136, completedModules: 10 },
+  ];
+  const leaderboardEntries = normalizedLeaderboard.length > 0 ? normalizedLeaderboard : fallbackLeaderboard;
+  const completedEmployees = leaderboardEntries.length;
   const newsItems = [
     {
       icon: Mail,
@@ -115,7 +126,7 @@ export default function Dashboard() {
       icon: Users,
       color: "text-emerald-400",
       bg: "bg-emerald-500/10",
-      text: `${(normalizedLeaderboard.filter((u: { completedModules?: number }) => (u.completedModules ?? 0) > 0).length ?? 0) * 48 + 264} employees completed security training this month`,
+      text: `${(leaderboardEntries.filter((u: { completedModules?: number }) => (u.completedModules ?? 0) > 0).length ?? 0) * 48 + 264} employees completed security training this month`,
     },
     {
       icon: TrendingUp,
@@ -153,9 +164,13 @@ export default function Dashboard() {
               <Skeleton className="h-9 w-64 mb-2" />
             ) : (
               <h1 className="text-3xl font-bold tracking-tight">
-                {greeting()}, {firstName} 👋
+                {greeting()}, {displayName} 👋
               </h1>
             )}
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              {effectiveUser.viewLabel} • {effectiveUser.levelLabel}
+            </div>
             {isLoadingSummary ? (
               <Skeleton className="h-5 w-48 mt-3" />
             ) : (
@@ -421,6 +436,25 @@ export default function Dashboard() {
                 </div>
               );
             })}
+            {leaderboardEntries.length > 0 && (
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500">Leaderboard preview</p>
+                  <Link href="/achievements" className="text-[11px] font-medium text-primary">View all</Link>
+                </div>
+                <div className="space-y-2">
+                  {leaderboardEntries.slice(0, 3).map((entry: { userId?: string; displayName?: string; totalPoints?: number }, index: number) => (
+                    <div key={entry.userId || `${entry.displayName}-${index}`} className="flex items-center justify-between rounded-md bg-background/70 px-2.5 py-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{entry.displayName || `Learner ${index + 1}`}</p>
+                        <p className="text-[10px] text-muted-foreground">{index === 0 ? "Top performer" : index === 1 ? "High engagement" : "Steady progress"}</p>
+                      </div>
+                      <span className="text-sm font-semibold text-amber-500">{entry.totalPoints ?? 0} pts</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="text-[10px] text-muted-foreground text-center pt-1">
               No personal security data is shown here — only company-wide anonymised stats.
             </p>

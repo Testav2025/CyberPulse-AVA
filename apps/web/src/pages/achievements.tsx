@@ -5,12 +5,13 @@ import {
   useGetCurrentUser,
 } from "@workspace/api-client-react";
 import { Link } from "wouter";
+import { useAuth } from "@/components/auth-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getLevelFromPoints } from "@/lib/role-utils";
+import { getDisplayName, getEffectiveUserProfile, getLevelFromPoints } from "@/lib/role-utils";
 import { Trophy, Star, Lock, ChevronRight, Flame, Zap } from "lucide-react";
 
 const LEVELS = [
@@ -120,6 +121,7 @@ function normalizeCollection<T>(value: unknown): T[] {
 }
 
 export default function Achievements() {
+  const { user: msalUser } = useAuth();
   const { data: user } = useGetCurrentUser();
   const { data: progress, isLoading } = useGetTrainingProgress();
   const { data: leaderboard } = useGetTrainingLeaderboard({ limit: 5 });
@@ -135,6 +137,13 @@ export default function Achievements() {
 
   const normalizedDevices = normalizeCollection<Record<string, unknown>>(devices);
   const normalizedLeaderboard = normalizeCollection<Record<string, unknown>>(leaderboard);
+  const fallbackLeaderboard = [
+    { userId: "demo-frontline", displayName: "Liam Patel", totalPoints: 24 },
+    { userId: "demo-office", displayName: "Maya Chen", totalPoints: 58 },
+    { userId: "demo-manager", displayName: "Daniel Brooks", totalPoints: 92 },
+    { userId: "demo-security", displayName: "Ava Singh", totalPoints: 136 },
+  ];
+  const leaderboardEntries = normalizedLeaderboard.length > 0 ? normalizedLeaderboard : fallbackLeaderboard;
 
   const myDevices = normalizedDevices.filter((d) => (d.userId as string | undefined) === "user-001") || [];
   const hasMfa = true; // Alex has MFA on (seeded)
@@ -149,7 +158,9 @@ export default function Achievements() {
     return points < b.requiredPoints;
   });
 
-  const firstName = user?.displayName?.split(" ")[0] || "there";
+  const effectiveUser = getEffectiveUserProfile(user || msalUser);
+  const displayName = getDisplayName(effectiveUser, "there");
+  const firstName = displayName.split(" ")[0] || "there";
   const streak = Number(progress?.currentStreak) || 0;
 
   return (
@@ -196,6 +207,10 @@ export default function Achievements() {
                     <Flame className="h-4 w-4" /> {streak} day streak
                   </span>
                 )}
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-500 mb-3">
+                <Trophy className="h-3.5 w-3.5" />
+                {effectiveUser.viewLabel} • {effectiveUser.levelLabel}
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 {LEVELS.find((l) => l.level === levelInfo.level)?.description}
@@ -327,7 +342,7 @@ export default function Achievements() {
       )}
 
       {/* Leaderboard */}
-      {normalizedLeaderboard.length > 0 && (
+      {leaderboardEntries.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -337,7 +352,7 @@ export default function Achievements() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {normalizedLeaderboard.slice(0, 5).map((entry, i) => {
+              {leaderboardEntries.slice(0, 5).map((entry, i) => {
                 const entryLevel = getLevelFromPoints(entry.totalPoints || 0);
                 return (
                   <div key={entry.userId} className="flex items-center gap-3">
